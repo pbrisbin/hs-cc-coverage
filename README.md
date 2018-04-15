@@ -10,8 +10,8 @@ Generate upload-able [Code Climate][] coverage payloads from [Hpc][] traces.
 This project is a minor player in, and extension to, the process of submitting
 coverage information to Code Climate. You are encouraged to understand the
 [overall mechanics][overview] of the feature and are expected to be familiar
-with the [`cc-test-reporter`][cc-test-report] executable, which handles most of
-the other steps.
+with the [`cc-test-reporter`][cc-test-reporter] executable, which handles most
+of the other steps.
 
 [overview]: https://docs.codeclimate.com/docs/configuring-test-coverage
 [cc-test-reporter]: https://github.com/codeclimate/test-reporter#readme
@@ -56,7 +56,7 @@ added each sub-project independently on Code Climate.
 
 ### One Code Climate Repository
 
-In this case, you can generate each sub-projects payloads then combine and
+In this case, you can generate each sub-project's payload then combine and
 upload them together:
 
 ```sh
