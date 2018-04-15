@@ -7,15 +7,15 @@ module CC.Coverage.GitInfo
 
 import CC.Coverage.Git
 import CC.Coverage.Sha
+import CC.Coverage.Timestamp
 import Data.Aeson
 import Data.Aeson.Casing
 import Data.Text (Text)
-import Data.Time
 import GHC.Generics
 
 data GitInfo = GitInfo
     { giBranch :: Text
-    , giCommittedAt :: UTCTime
+    , giCommittedAt :: Timestamp
     , giHead :: Sha
     }
     deriving Generic
@@ -27,5 +27,5 @@ instance ToJSON GitInfo where
 getGitInfo :: IO GitInfo
 getGitInfo = GitInfo
     <$> getBranch
-    <*> getCommittedAt
+    <*> (Timestamp <$> getCommittedAt)
     <*> getCommitSha
