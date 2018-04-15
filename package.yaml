@@ -1,0 +1,62 @@
+---
+name: cc-coverage
+version: '0.1.0.0'
+# synopsis:
+# description:
+category: Text
+author: Patrick Brisbin
+maintainer: pbrisbin@gmail.com
+copyright: 2018 Patrick Brisbin
+license: MIT
+github: pbrisbin/hs-cc-coverage
+extra-source-files:
+  - README.md
+  - CHANGELOG.md
+
+dependencies:
+  - base >= 4.7 && <5
+
+ghc-options: -Wall
+
+library:
+  source-dirs: src
+  dependencies:
+    - Glob
+    - aeson
+    - aeson-casing
+    - bytestring
+    - containers
+    - directory
+    - filepath
+    - hpc
+    - optparse-applicative
+    - process
+    - safe-exceptions
+    - text
+    - time
+
+executables:
+  tix2cc:
+    main: Main.hs
+    source-dirs: tix2cc
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - aeson
+      - bytestring
+      - cc-coverage
+      - safe-exceptions
+
+# tests:
+#   hspec:
+#     main: Spec.hs
+#     source-dirs: test
+#     ghc-options:
+#       - -threaded
+#       - -rtsopts
+#       - -with-rtsopts=-N
+#     dependencies:
+#       - hspec
+#       - shellwords
