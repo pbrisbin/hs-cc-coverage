@@ -8,6 +8,7 @@ module CC.Coverage.SourceFile
 
 import CC.Coverage.Coverage
 import CC.Coverage.Git
+import CC.Coverage.Percentage
 import CC.Coverage.Sha
 import CC.Coverage.Stringly
 import CC.Coverage.TixData
@@ -22,6 +23,7 @@ import Trace.Hpc.Util
 data SourceFile = SourceFile
     { sfName :: FilePath -- ^ Must be Absolute
     , sfBlobId :: Sha
+    , sfCoveredPercent :: Percentage
     , sfCoverage :: Stringly [Coverage]
     }
     deriving Generic
@@ -31,10 +33,14 @@ instance ToJSON SourceFile where
     toEncoding = genericToEncoding $ aesonPrefix snakeCase
 
 tixDataToSourceFile :: TixData -> IO SourceFile
-tixDataToSourceFile tixData@TixData {..} = SourceFile
-    <$> pure tdPath
-    <*> getBlobId tdPath
-    <*> pure (Stringly $ tixDataToCoverage tixData)
+tixDataToSourceFile tixData@TixData {..} = do
+    let coverage = tixDataToCoverage tixData
+
+    SourceFile
+        <$> pure tdPath
+        <*> getBlobId tdPath
+        <*> pure (toCoveredPercent coverage)
+        <*> pure (Stringly coverage)
 
 tixDataToCoverage :: TixData -> [Coverage]
 tixDataToCoverage TixData {..} = map lookupCoverage [1 .. lineCount]
@@ -42,7 +48,7 @@ tixDataToCoverage TixData {..} = map lookupCoverage [1 .. lineCount]
     lineCount = length $ T.lines tdSource
 
     lookupCoverage =
-        maybe Uncovered (Covered . fromIntegral) . flip Map.lookup tixMap
+        maybe Ignored (Coverable . fromIntegral) . flip Map.lookup tixMap
 
     tixMap = Map.fromList . map (first $ fst4 . fromHpcPos . fst) $ zip
         tdMixEntries

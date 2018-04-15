@@ -9,7 +9,7 @@ module CC.Coverage.Stringly
 import Data.Aeson
 import qualified Data.ByteString.Lazy.Char8 as C8
 
-newtype Stringly a = Stringly a
+newtype Stringly a = Stringly { unStringly :: a }
 
 instance ToJSON a => ToJSON (Stringly a) where
     toJSON (Stringly a) = toJSON . C8.unpack $ encode a
