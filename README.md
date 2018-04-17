@@ -35,29 +35,30 @@ tix2cc | cc-test-reporter upload-coverage --id "REPORTER_ID" --input -
 
 Hpc (at least with Stack and using the versions I've tested) names its Tix files
 as `.../<package>/<suite>/<suite>.tix`. So if you only want to process some of
-your project's test suites, you can limit the Tix files processed by `PATTERN`.
-
-For example, if you have two test suites, `hspec` and `doctests`, you could
-limit coverage uploads to the `hspec` suite with:
+your project's test suites, you can limit the Tix files processed by passing a
+`PATTERN` argument. For example, if you have two test suites, `hspec` and
+`doctests`, you could limit coverage uploads to the `hspec` suite with:
 
 ```console
 tix2cc '**/hspec.tix' | ...
 ```
 
-**NOTE**: Be careful to quote the `PATTERN` argument, so your shell doesn't try
-to expand it itself.
+**NOTE**: Be sure to quote the `PATTERN` argument, so your shell doesn't try to
+expand it itself.
 
 ## Multiple Projects
 
 If you are operating in the context of a "monorepo" (multiple packages present
-in one repository), you will want to use the `-C`/`--directory` option. Usage
-depends on if your repository is also a single Code Climate repository or you've
-added each sub-project independently on Code Climate.
+in one repository), you will want to use the `-C`/`--directory` option. Exact
+usage depends on if your repository is also a single Code Climate repository or
+if you've added each package independently on Code Climate. (The latter is an
+uncommon but useful workaround for Code Climate's lack of first-class
+sub-directory analysis.)
 
 ### One Code Climate Repository
 
-In this case, you can generate each sub-project's payload then combine and
-upload them together:
+In this case, you can generate each package's payload then combine and upload
+them together:
 
 ```sh
 stack test --coverage
