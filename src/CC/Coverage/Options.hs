@@ -29,7 +29,7 @@ data Options = Options
 parseOptions :: IO Options
 parseOptions = execParser
     $ info (helper <*> parser)
-    $ fullDesc <> progDesc "Create Code Climate coverage files from HPC output"
+    $ fullDesc <> progDesc "Create Code Climate coverage files from Hpc traces"
 
 parser :: Parser Options
 parser = Options

@@ -44,9 +44,11 @@ executables:
       - -rtsopts
       - -with-rtsopts=-N
     dependencies:
+      - Glob
       - aeson
       - bytestring
       - cc-coverage
+      - hpc
       - safe-exceptions
 
 # tests:
