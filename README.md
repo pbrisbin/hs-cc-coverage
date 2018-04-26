@@ -31,6 +31,24 @@ stack test --coverage
 tix2cc | cc-test-reporter upload-coverage --id "REPORTER_ID" --input -
 ```
 
+## Options
+
+```
+Usage: tix2cc [-m|--mix-dir DIR] [-t|--tix-dir DIR] [-p|--prefix PATH] [PATTERN]
+  Create Code Climate coverage files from Hpc traces
+
+Available options:
+  -h,--help                Show this help text
+  -m,--mix-dir DIR         Directory for .mix files, inferred for Stack or
+                           dist/hpc/mix
+  -t,--tix-dir DIR         Directory for .tix files, inferred for Stack or
+                           dist/hpc/tix
+  -p,--prefix PATH         Path prefix to apply, in the case of sub-directory
+                           projects
+  PATTERN                  Pattern used to locate .tix files, default is
+                           **/*.tix
+```
+
 ## Multiple Test Suites
 
 Hpc (at least with Stack and using the versions I've tested) names its Tix files
@@ -46,45 +64,6 @@ tix2cc '**/hspec.tix' | ...
 **NOTE**: Be sure to quote the `PATTERN` argument, so your shell doesn't try to
 expand it itself.
 
-## Multiple Projects
-
-If you are operating in the context of a "monorepo" (multiple packages present
-in one repository), you will want to use the `-C`/`--directory` option. Exact
-usage depends on if your repository is also a single Code Climate repository or
-if you've added each package independently on Code Climate. (The latter is an
-uncommon but useful workaround for Code Climate's lack of first-class
-sub-directory analysis.)
-
-### One Code Climate Repository
-
-In this case, you can generate each package's payload then combine and upload
-them together:
-
-```sh
-stack test --coverage
-
-tix2hs --directory ./project-a > coverage/project-a.json
-
-tix2hs --directory ./project-b > coverage/project-b.json
-
-cc-test-reporter sum-coverage --parts 2 --output - coverage/*.json |\
-  cc-test-reporter upload-coverage --id "REPORTER_ID" --input -
-```
-
-### Separate Code Climate Repositories
-
-In this case, you need to generate and upload each payload separately:
-
-```sh
-stack test --coverage
-
-tix2hs --directory ./project-a |\
-  cc-test-reporter upload-coverage --id "PROJECT_A_REPORTER_ID" --input -
-
-tix2hs --directory ./project-b |\
-  cc-test-reporter upload-coverage --id "PROJECT_B_REPORTER_ID" --input -
-```
-
 ## Non-Stack Usage
 
 `tix2cc` uses `stack path` to automatically locate the directories where `hpc`
@@ -94,6 +73,12 @@ If you're not using stack, you must either:
 
 - Ensure `hpc` places its files in `dist/hpc/{mix,tix}`, or
 - Pass `-m`/`--mix-dir` and `-t`/`--tix-dir`
+
+**NOTE**: multi-package projects will not work without Stack, specifically a
+version with `stack query`. We need this to find local-dependency working
+directories, which is where their `.mix` files reside. I've not yet figured out
+how to support this in a non-Stack context. If you know how to do so, please
+open an Issue.
 
 ## Non-Git Usage
 

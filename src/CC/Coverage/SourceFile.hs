@@ -14,8 +14,8 @@ import CC.Coverage.Sha
 import CC.Coverage.Stringly
 import Data.Aeson
 import Data.Aeson.Casing
+import Data.Semigroup ((<>))
 import GHC.Generics
-import System.Directory (makeRelativeToCurrentDirectory)
 
 data SourceFile = SourceFile
     { sfName :: FilePath
@@ -29,12 +29,12 @@ instance ToJSON SourceFile where
     toJSON = genericToJSON $ aesonPrefix snakeCase
     toEncoding = genericToEncoding $ aesonPrefix snakeCase
 
-fromFileCoverage :: FileCoverage -> IO SourceFile
-fromFileCoverage FileCoverage{..} = do
+fromFileCoverage :: String -> FileCoverage -> IO SourceFile
+fromFileCoverage prefix FileCoverage{..} = do
     let coverage = map lcCoverage fcLineCoverage
 
     SourceFile
-        <$> makeRelativeToCurrentDirectory fcPath
+        <$> pure (prefix <> fcPath)
         <*> getBlobId fcPath
         <*> pure (toCoveredPercent coverage)
         <*> pure (Stringly coverage)

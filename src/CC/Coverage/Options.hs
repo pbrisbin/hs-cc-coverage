@@ -4,7 +4,6 @@
 module CC.Coverage.Options
     ( Options(..)
     , parseOptions
-    , withinProject
     , getMixDir
     , getTixDir
     ) where
@@ -14,7 +13,6 @@ import Control.Exception.Safe
 import Data.Maybe (fromMaybe)
 import Data.Semigroup ((<>))
 import Options.Applicative
-import System.Directory (withCurrentDirectory)
 import System.FilePath
 import System.FilePath.Glob
 import System.Process
@@ -22,7 +20,7 @@ import System.Process
 data Options = Options
     { oMixDir :: Maybe FilePath
     , oTixDir :: Maybe FilePath
-    , oDirectory :: Maybe FilePath
+    , oPrefix :: String
     , oPattern :: Pattern
     }
 
@@ -45,21 +43,18 @@ parser = Options
         <> metavar "DIR"
         <> help "Directory for .tix files, inferred for Stack or dist/hpc/tix"
         ))
-    <*> optional (strOption
-        (  short 'C'
-        <> long "directory"
-        <> metavar "DIR"
-        <> help "Directory to run within, default is current"
-        ))
+    <*> strOption
+        (  short 'p'
+        <> long "prefix"
+        <> metavar "PATH"
+        <> help "Path prefix to apply, in the case of sub-directory projects"
+        <> value ""
+        )
     <*> (compile <$> argument str
         (  metavar "PATTERN"
         <> help "Pattern used to locate .tix files, default is **/*.tix"
         <> value "**/*.tix"
         ))
-
-withinProject :: Options -> IO () -> IO ()
-withinProject Options {..} =
-    maybe id withCurrentDirectory oDirectory
 
 getMixDir :: Options -> IO FilePath
 getMixDir Options {..} = do

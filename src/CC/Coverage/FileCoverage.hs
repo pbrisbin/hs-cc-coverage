@@ -12,6 +12,7 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Numeric.Natural
+import System.Directory (getCurrentDirectory, withCurrentDirectory)
 import System.FilePath
 import Trace.Hpc.Mix
 import Trace.Hpc.Tix
@@ -29,12 +30,29 @@ data LineCoverage = LineCoverage
     }
 
 fromTixModule
-    :: FilePath -- ^ Directory where @.mix@ files can be found
+    :: (String -> Maybe FilePath)
+    -- ^ Alternate source paths by package
+    -> FilePath
+    -- ^ Relative directory where @.mix@ files can be found
     -> TixModule
     -> IO FileCoverage
-fromTixModule mixDir tixModule = do
-    mix <- readMix (mixPaths mixDir tixModule) $ Right tixModule
-    srcLines <- T.lines <$> T.readFile (mixPath mix)
+fromTixModule lookupLocalSources mixDir tixModule = do
+    let localSources = lookupLocalSources
+            $ takeWhile (/= '/')
+            $ tixModuleName tixModule
+
+    (mix, path) <-
+        case localSources of
+            Just path -> do
+                cwd <- getCurrentDirectory
+                withCurrentDirectory path $ do
+                    mix <- readMix (mixPaths mixDir tixModule) $ Right tixModule
+                    pure (mix, makeRelative cwd $ path </> mixPath mix)
+            Nothing -> do
+                mix <- readMix (mixPaths mixDir tixModule) $ Right tixModule
+                pure (mix, mixPath mix)
+
+    srcLines <- T.lines <$> T.readFile path
 
     let
         hitMap :: Map Natural Integer
@@ -43,7 +61,7 @@ fromTixModule mixDir tixModule = do
             $ zip (mixEntries mix) (tixModuleTixs tixModule)
 
     pure FileCoverage
-        { fcPath = mixPath mix
+        { fcPath = path
         , fcLineCoverage = zipWith (toLineCoverage hitMap) [1 ..] srcLines
         }
 
