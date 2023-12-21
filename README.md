@@ -1,5 +1,9 @@
 # Haskell Code Climate Coverage
 
+**Archived**: this project is no longer maintained. Please use hpc-lcov or
+hpc-codecov to [re-]format Haskell coverage for ingestion into tools like
+Code Climate.
+
 Generate upload-able [Code Climate][] coverage payloads from [Hpc][] traces.
 
 [code climate]: https://codeclimate.com/
